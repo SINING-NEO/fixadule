@@ -232,7 +232,8 @@ function setupJoin() {
     const known = knownPeople().find((p) => p.name.toLowerCase() === name.toLowerCase());
     if (known && (await resume(known))) return renderAll();
 
-    const btn = e.submitter;
+    const btn = $('join-form').querySelector('button[type="submit"]');
+    if (btn.disabled) return;
     btn.disabled = true;
     try {
       const person = await api('PUT', `/api/events/${eventId}/me`, { name, slots: [] });
@@ -241,7 +242,7 @@ function setupJoin() {
       if (ev.isHost) await refresh();
       renderAll();
     } catch (err) {
-      errorEl.textContent = err.message;
+      errorEl.textContent = err.status ? err.message : "Couldn't reach the server. Check your internet connection and try again.";
       errorEl.hidden = false;
     } finally {
       btn.disabled = false;
@@ -448,7 +449,7 @@ function renderFocusMarkers() {
 }
 
 function heat(ratio) {
-  return `rgba(22, 163, 74, ${0.18 + 0.82 * ratio})`;
+  return `rgba(84, 110, 100, ${0.14 + 0.66 * ratio})`;
 }
 
 function renderAll() {
