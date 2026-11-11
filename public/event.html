@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16a34a">
+  <title>Fixadule</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="logo">F</span>Fixadule</a>
+    <a class="btn ghost small" href="./">+ New event</a>
+  </header>
+
+  <main class="container">
+    <div id="loading" class="muted center pad">Loading…</div>
+    <div id="not-found" class="card center" hidden>
+      <h2>Event not found</h2>
+      <p class="muted">The link may be wrong or the event was removed.</p>
+      <a class="btn primary" href="./">Create a new event</a>
+    </div>
+
+    <div id="app" hidden>
+      <section class="event-head">
+        <div class="event-title-row">
+          <h1 id="event-title"></h1>
+          <span id="host-badge" class="pill good" hidden>You're the host</span>
+        </div>
+        <p id="event-meta" class="muted"></p>
+      </section>
+
+      <section id="invite" class="card invite">
+        <div>
+          <h2 id="invite-title">Invite friends</h2>
+          <p id="invite-text" class="muted small-text"></p>
+        </div>
+        <div class="share">
+          <input id="share-url" type="text" readonly aria-label="Invite link">
+          <button id="share-btn" class="btn primary" type="button">Copy link</button>
+        </div>
+        <details id="host-link-box" class="host-link" hidden>
+          <summary>Your private host link</summary>
+          <p class="muted small-text">Open this on any phone or computer to see the overview. <b>Don't share it</b>, because anyone with it can see everyone's answers.</p>
+          <div class="share">
+            <input id="host-url" type="text" readonly aria-label="Host link">
+            <button id="host-copy" class="btn" type="button">Copy</button>
+          </div>
+        </details>
+      </section>
+
+      <div id="panels" class="panels">
+        <section id="overview" class="card panel" hidden>
+          <div class="panel-head">
+            <h2>Overview</h2>
+            <span id="response-count" class="pill"></span>
+          </div>
+          <p class="muted small-text">Only you can see this.</p>
+
+          <div id="empty-group" class="empty muted">No one has responded yet. Share the invite link with your friends!</div>
+
+          <div id="group" hidden>
+            <h3 class="first">Best times</h3>
+            <ol id="best-list" class="best-list"></ol>
+
+            <h3>Everyone's availability</h3>
+            <div class="legend">
+              <span class="muted small-text">Fewer</span>
+              <div id="legend-scale" class="legend-scale"></div>
+              <span class="muted small-text">More people free</span>
+            </div>
+            <div id="group-grid" class="grid"></div>
+            <div id="hover-info" class="hover-info muted small-text"></div>
+
+            <h3>Who's responded</h3>
+            <p class="muted small-text">Tap a name to see only their times.</p>
+            <div id="people-list" class="chips"></div>
+          </div>
+        </section>
+
+        <section id="mine" class="card panel">
+          <div id="join">
+            <h2 id="join-title">Add your availability</h2>
+            <p id="join-text" class="muted small-text"></p>
+            <form id="join-form" class="join-form">
+              <input id="name-input" type="text" maxlength="40" placeholder="Your name" autocomplete="given-name" enterkeyhint="go" required>
+              <button class="btn primary" type="submit">Continue</button>
+            </form>
+            <p id="join-error" class="error small-text" hidden></p>
+          </div>
+
+          <div id="editor" hidden>
+            <div class="panel-head">
+              <h2>Hi <span id="me-name"></span>!</h2>
+              <button id="switch-user" class="link" type="button">Not you?</button>
+            </div>
+            <p class="muted small-text"><span class="pointer-fine">Click and drag</span><span class="pointer-coarse">Tap or drag</span> over the times you're <b>free</b>. Do it again to unselect.</p>
+
+            <div id="touch-mode" class="segmented pointer-coarse-flex" role="group" aria-label="Touch mode">
+              <button type="button" data-mode="select" class="on">Select times</button>
+              <button type="button" data-mode="scroll">Scroll page</button>
+            </div>
+
+            <div id="my-grid" class="grid editable"></div>
+            <div class="editor-foot">
+              <span id="save-status" class="muted small-text"></span>
+              <div class="editor-actions">
+                <button id="clear-btn" class="btn ghost small" type="button">Clear all</button>
+                <button id="remove-btn" class="btn ghost small danger" type="button">Remove me</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script src="event.js"></script>
+</body>
+</html>

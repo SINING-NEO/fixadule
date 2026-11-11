@@ -1,0 +1,14 @@
+{
+  "name": "fixadule",
+  "version": "1.0.0",
+  "description": "Find a time that works for everyone. Share a link, everyone paints their free times, the host sees the overlap.",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler d1 migrations apply fixadule --local && wrangler dev",
+    "deploy": "wrangler d1 migrations apply fixadule --remote && wrangler deploy"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^4.160.0"
+  }
+}

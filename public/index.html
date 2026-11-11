@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#16a34a">
+  <title>Fixadule · Find a time that works for everyone</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="logo">F</span>Fixadule</a>
+  </header>
+
+  <main class="container narrow">
+    <section class="hero">
+      <h1>When is everyone free?</h1>
+      <p class="muted">Create an event, share the link, and everyone marks their free times. Only you see where they overlap.</p>
+    </section>
+
+    <form id="create-form" class="card">
+      <label class="field">
+        <span>Event name</span>
+        <input id="title" type="text" maxlength="80" placeholder="e.g. Board game night" autocomplete="off">
+      </label>
+
+      <div class="field">
+        <span>Which days?</span>
+        <div id="days" class="day-picker"></div>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span>No earlier than</span>
+          <select id="start"></select>
+        </label>
+        <label class="field">
+          <span>No later than</span>
+          <select id="end"></select>
+        </label>
+      </div>
+
+      <p id="form-error" class="error" hidden></p>
+      <button class="btn primary big" type="submit">Create event</button>
+    </form>
+
+    <section id="recent" class="recent" hidden>
+      <h2>Your recent events</h2>
+      <ul id="recent-list"></ul>
+    </section>
+
+    <section class="steps">
+      <div><b>1</b><span>Create an event and pick the days</span></div>
+      <div><b>2</b><span>Send the link to your friends</span></div>
+      <div><b>3</b><span>Everyone drags over their free times</span></div>
+      <div><b>4</b><span>Only you, the host, see the overview and best times</span></div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+  <script>
+    const daysEl = document.getElementById('days');
+    const startEl = document.getElementById('start');
+    const endEl = document.getElementById('end');
+    const errorEl = document.getElementById('form-error');
+    const selectedDays = new Set([0, 1, 2, 3, 4, 5, 6]);
+
+    DAY_NAMES.forEach((name, i) => {
+      const btn = el('button', { type: 'button', class: 'day-toggle on', 'aria-pressed': 'true', text: name });
+      btn.addEventListener('click', () => {
+        selectedDays.has(i) ? selectedDays.delete(i) : selectedDays.add(i);
+        const on = selectedDays.has(i);
+        btn.classList.toggle('on', on);
+        btn.setAttribute('aria-pressed', String(on));
+      });
+      daysEl.append(btn);
+    });
+
+    for (let h = 0; h <= 24; h++) {
+      const label = h === 24 ? 'Midnight' : fmtTime(h * 60);
+      if (h < 24) startEl.append(el('option', { value: h * 60, text: label }));
+      if (h > 0) endEl.append(el('option', { value: h * 60, text: label }));
+    }
+    startEl.value = 9 * 60;
+    endEl.value = 22 * 60;
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.hidden = true;
+      const start = Number(startEl.value);
+      const end = Number(endEl.value);
+      if (!selectedDays.size) return showError('Pick at least one day.');
+      if (end <= start) return showError('"No later than" must be after "No earlier than".');
+
+      const btn = e.submitter;
+      btn.disabled = true;
+      btn.textContent = 'Creating…';
+      try {
+        const ev = await api('POST', '/api/events', {
+          title: document.getElementById('title').value,
+          days: [...selectedDays].sort(),
+          start,
+          end,
+        });
+        saveHostKey(ev.id, ev.hostKey);
+        rememberEvent(ev);
+        location.href = eventUrl(ev.id);
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Create event';
+      }
+    });
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.hidden = false;
+    }
+
+    const recent = getRecent();
+    if (recent.length) {
+      document.getElementById('recent').hidden = false;
+      const list = document.getElementById('recent-list');
+      for (const r of recent) {
+        list.append(el('li', {},
+          el('a', { href: eventUrl(r.id), text: r.title }),
+          hostKeyFor(r.id) ? el('span', { class: 'pill good', text: 'Host' }) : null,
+        ));
+      }
+    }
+  </script>
+</body>
+</html>
