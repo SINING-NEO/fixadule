@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "fixadule",
-      "database_id": "local-placeholder",
+      "database_id": "2b3ec496-f7f5-4fc1-98a5-3e516e6ed5a2",
       "migrations_dir": "migrations"
     }
   ],
